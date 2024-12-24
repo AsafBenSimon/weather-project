@@ -1,0 +1,28 @@
+.CitySearch-parent {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.SaveButton {
+  background-color: rgb(34, 34, 197);
+  width: 70px;
+  height: 35px;
+  border-radius: 10px;
+  color: rgb(233, 233, 233);
+  border: none;
+}
+.CityName {
+  color: rgb(247, 247, 247);
+}
+.MyLocationButton {
+  background-color: rgb(46, 75, 191);
+  width: 140px;
+  height: 35px;
+  border-radius: 10px;
+  color: rgb(233, 233, 233);
+  margin-bottom: 20px;
+  border: none;
+}
+.enter-city-name-input {
+  border: none;
+}

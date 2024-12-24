@@ -1,0 +1,15 @@
+.NavBar {
+  display: flex;
+  align-items: center;
+  align-content: center;
+  justify-content: space-between;
+  padding: 15px 10px 15px 10px;
+  background-color: rgba(0, 0, 0, 0.781);
+  color: white;
+  margin-bottom: 50px;
+}
+.NavBar-MiniContainer {
+  display: flex;
+  justify-content: space-between;
+  width: 150px;
+}
