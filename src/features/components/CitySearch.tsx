@@ -1,129 +1,117 @@
-import "../components/CitySearch";
-import "../components/CitySearch.css";
-import { useEffect, useState } from "react";
-import { weatherSerivce } from "../services/weatherService";
+import React, { useEffect, useState } from "react";
 import { CityData } from "../../types/CityData";
 import { CurrentConditionsData } from "../../types/CurrentConditions";
-
-interface ShowFirstCity {
-  CountryId: string;
-  LocalizedName: string;
-}
-
-const initialCity: ShowFirstCity = {
-  CountryId: "",
-  LocalizedName: "", // Default city
-};
+import { weatherService } from "../services/weatherService";
 
 function CitySearch() {
-  const apiKey = process.env.REACT_APP_API_KEY;
-
   const [cityData, setCityData] = useState<CityData | null>(null);
-  const [cityName, setCityName] = useState<string>("");
-  const [filteredCities, setFilteredCities] = useState<CityData[]>([]);
   const [currentConditions, setCurrentConditions] = useState<
     CurrentConditionsData | undefined
-  >();
+  >(undefined);
+  const [forecastData, setForecastData] = useState<any[]>([]);
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [suggestedCities, setSuggestedCities] = useState<CityData[]>([]); // Store suggested cities
 
-  useEffect(() => {
-    fetchCities();
-  }, [cityName]);
+  // Handle search input change
+  const handleSearchChange = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const query = event.target.value;
+    setSearchQuery(query);
 
-  useEffect(() => {
-    handleCitySelect({
-      LocalizedName: "Tel Aviv",
-      Key: 0,
-      CountryId: "IL",
-    });
-  }, []);
-
-  const fetchCities = async () => {
-    setFilteredCities((await weatherSerivce.getCities(cityName)) || []);
+    // Fetch top cities as user types
+    if (query.length > 0) {
+      const cities = await weatherService.getCities(query);
+      setSuggestedCities(cities || []);
+    } else {
+      setSuggestedCities([]); // Clear suggestions if search is empty
+    }
   };
 
-  const handleSearch = async () => {
-    const currentConditions = await weatherSerivce.getCityCurrentConditions(
-      cityData?.Key ?? 0
-    );
-    setCurrentConditions(currentConditions);
-  };
+  // Handle city selection
+  const handleCitySelect = async (city: CityData) => {
+    setCityData(city); // Set the selected city
+    setSearchQuery(city.LocalizedName); // Update search bar with the selected city's name
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = event.target.value;
-    setCityName(value);
-
-    // Filter the original list of cities based on input value
-    const filtered: CityData[] = filteredCities.filter((city) =>
-      city.LocalizedName.toLowerCase().includes(value.toLowerCase())
-    );
-
-    if (filtered.length == 1) {
-      setCityData({
-        Key: filtered[0].Key,
-        LocalizedName: filtered[0].LocalizedName,
-        CountryId: filtered[0].CountryId,
-      });
+    // Fetch current weather and forecast for the selected city
+    if (city.Key) {
+      fetchCurrentWeather(city.Key.toString());
+      fetchForecast(city.Key.toString());
     }
 
-    filtered.pop();
-
-    setFilteredCities(filtered);
+    setSuggestedCities([]); // Clear the suggestions after a city is selected
   };
 
-  const handleCitySelect = (selectedCity: CityData) => {
-    setCityName(selectedCity.LocalizedName);
-    setCityData({
-      LocalizedName: selectedCity.LocalizedName,
-      Key: selectedCity.Key,
-      CountryId: selectedCity.CountryId,
-    });
-    setFilteredCities([]);
-    // Optionally perform search or other logic here
+  useEffect(() => {
+    if (cityData?.Key) {
+      fetchCurrentWeather(cityData.Key.toString());
+      fetchForecast(cityData.Key.toString());
+    }
+  }, [cityData]);
+
+  const fetchCurrentWeather = async (cityKey: string) => {
+    try {
+      const weather = await weatherService.getCityCurrentConditions(cityKey);
+      setCurrentConditions(weather);
+    } catch (error) {
+      console.error("Error fetching current weather", error);
+    }
+  };
+
+  const fetchForecast = async (cityKey: string) => {
+    try {
+      const forecast = await weatherService.getForecast(cityKey);
+      setForecastData(forecast.DailyForecasts || []);
+    } catch (error) {
+      console.error("Error fetching forecast", error);
+    }
   };
 
   return (
-    <div className="CitySearch-parent">
-      <div className="CitySearch">
+    <div className="CitySearch">
+      {/* Search Bar */}
+      <form onSubmit={(e) => e.preventDefault()}>
         <input
-          className="enter-city-name-input"
           type="text"
-          name="city"
-          id="city"
-          placeholder="Enter city Name"
-          value={cityName}
-          onChange={handleChange}
+          value={searchQuery}
+          onChange={handleSearchChange}
+          placeholder="Search for a city"
         />
-        <button onClick={handleSearch}>Search</button>
-        {/* Dropdown menu for suggestions */}
-        {filteredCities.length > 0 && (
-          <div className="suggestions">
-            {filteredCities.map((city) => (
-              <div
-                key={city.Key}
-                className="suggestion"
-                onClick={() => handleCitySelect(city)}
-              >
-                {city.LocalizedName}
-              </div>
-            ))}
+      </form>
+
+      {/* City Suggestions */}
+      {suggestedCities.length > 0 && (
+        <ul className="suggestions-list">
+          {suggestedCities.map((city) => (
+            <li key={city.Key} onClick={() => handleCitySelect(city)}>
+              {city.LocalizedName}, {city.CountryId}
+            </li>
+          ))}
+        </ul>
+      )}
+
+      {/* City Info */}
+      {cityData && (
+        <div className="city-info">
+          <h2>{cityData.LocalizedName}</h2>
+          {currentConditions && (
+            <div className="current-weather">
+              <p>{currentConditions.WeatherText}</p>
+              <p>{`${currentConditions.Temperature.Metric.Value}°C`}</p>
+            </div>
+          )}
+          <div className="forecast">
+            {forecastData.length > 0 &&
+              forecastData.map((forecast, index) => (
+                <div key={index}>
+                  <h3>{forecast.Date}</h3>
+                  <p>{forecast.Day.IconPhrase}</p>
+                  <p>{`${forecast.Temperature.Minimum.Value}°C / ${forecast.Temperature.Maximum.Value}°C`}</p>
+                </div>
+              ))}
           </div>
-        )}
-
-        <button className="SaveButton" type="button">
-          Save
-        </button>
-        <div className="Location-button-Container">
-          <button className="MyLocationButton" type="button">
-            My Location
-          </button>
         </div>
-
-        <div>
-          <h2 className="CityName">
-            {cityData?.CountryId}, {cityData?.LocalizedName}
-          </h2>
-        </div>
-      </div>
+      )}
     </div>
   );
 }

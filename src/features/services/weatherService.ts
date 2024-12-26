@@ -1,72 +1,52 @@
 import axios from "axios";
-import { CityData, CityDataRecive } from "../../types/CityData";
+import { CityData, WeatherForecast } from "../../types/CityData";
 import { CurrentConditionsData } from "../../types/CurrentConditions";
 
-const apiKey = process.env.REACT_APP_API_KEY;
+const API_KEY = "krV1LedrWlI4U83mJ6fvNuOfYkFkqAfx";
 
-const baseUrl = "http://dataservice.accuweather.com/";
-const searchVersion = "v1/";
-const locationsUrl = `${baseUrl}locations/${searchVersion}cities/autocomplete?apikey=${apiKey}`;
-
-const getCity = async (cityName: string, lang = "en-us", details = false) => {
-  const city = await axios
-    .get(
-      `${baseUrl}/locations/v1/cities/search?apikey=${apiKey}&q=${cityName}&language=${lang}&details=${details}`
-    )
-    .then((response) => {
-      const { Key, EnglishName } = response.data[0];
-      return { Key, EnglishName };
-    });
-  console.log(city);
-  // key , english name,
-  return city;
-};
-
-const getCities = async (cityName: string): Promise<CityData[] | undefined> => {
-  try {
-    const response = await axios.get(`${locationsUrl}&q=${cityName}`);
-    if (response.status === 200) {
-      const citiesData: CityData[] = (response.data as CityDataRecive[]).map(
-        (city) => {
-          return {
-            Key: city.Key,
-            LocalizedName: city.LocalizedName,
-            CountryId: city.Country.ID,
-          };
-        }
-      );
-      if (citiesData) {
-        const firstTenCities = citiesData.slice(0, 10);
-        return firstTenCities;
+export const weatherService = {
+  // Fetch city suggestions
+  getCities: async (query: string): Promise<CityData[]> => {
+    const response = await axios.get(
+      `https://dataservice.accuweather.com/locations/v1/cities/autocomplete`,
+      {
+        params: {
+          apikey: API_KEY,
+          q: query,
+        },
       }
-    }
-  } catch (error) {
-    console.error("Error fetching cities:", error);
-  }
-};
-
-const getCityCurrentConditions = async (
-  cityKey: number
-): Promise<CurrentConditionsData | undefined> => {
-  try {
-    const currentConditionsResponse = await axios.get(
-      `${baseUrl}currentconditions/v1/${cityKey}?&apikey=${apiKey}`
     );
-    if (currentConditionsResponse.status == 200) {
-      const currentConditions =
-        currentConditionsResponse.data as CurrentConditionsData;
+    return response.data;
+  },
 
-      if (currentConditions) {
-        return currentConditions;
+  // Fetch current conditions for a city
+  getCityCurrentConditions: async (
+    cityKey: string
+  ): Promise<CurrentConditionsData> => {
+    const response = await axios.get(
+      `https://dataservice.accuweather.com/currentconditions/v1/${cityKey}`,
+      {
+        params: {
+          apikey: API_KEY,
+        },
       }
-    }
-  } catch (error) {
-    console.log("error", error);
-  }
-};
+    );
+    return response.data[0];
+  },
 
-export const weatherSerivce = {
-  getCity,
-  getCities,
-  getCityCurrentConditions,
+  // Fetch 5-day weather forecast for a city
+  getForecast: async (
+    cityKey: string
+  ): Promise<{ DailyForecasts: WeatherForecast[] }> => {
+    const response = await axios.get(
+      `https://dataservice.accuweather.com/forecasts/v1/daily/5day/${cityKey}`,
+      {
+        params: {
+          apikey: API_KEY,
+          metric: true,
+        },
+      }
+    );
+    return response.data;
+  },
 };

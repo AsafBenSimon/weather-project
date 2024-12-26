@@ -1,9 +1,19 @@
-.Card {
+.CardLine-Container {
   display: flex;
-  align-items: center;
-  flex-direction: column;
-  min-height: 200px;
-  border-radius: 30px;
-  width: 175px;
-  background-color: aliceblue;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+}
+
+.Card {
+  border: 1px solid #ccc;
+  padding: 10px;
+  border-radius: 8px;
+  width: 150px;
+  text-align: center;
+}
+
+.Card img {
+  width: 50px;
+  height: 50px;
 }

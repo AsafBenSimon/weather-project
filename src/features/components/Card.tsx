@@ -1,22 +1,23 @@
-import React from "react";
-import "./Card.css";
+type CardProps = {
+  data: {
+    date: string;
+    day: string;
+    temps: string;
+    icon: number;
+  };
+};
 
-type data = { date: string; day: string; temps: string; icon: string };
-
-interface iCardProps {
-  data: data;
-}
-
-const Card: React.FC<iCardProps> = ({ data }) => {
-  const { date, day, temps, icon } = data;
+const Card = ({ data }: CardProps) => {
+  const iconUrl = `https://developer.accuweather.com/sites/default/files/${
+    data.icon < 10 ? `0${data.icon}` : data.icon
+  }-s.png`; // Build icon URL based on the icon code
 
   return (
     <div className="Card">
-      <h2>
-        {date} {day}
-      </h2>
-      <h3>{temps} </h3>
-      <img src={icon} alt="☀️" />
+      <p>{data.date}</p>
+      <p>{data.day}</p>
+      <p>{data.temps}</p>
+      <img src={iconUrl} alt={data.day} /> {/* Render the icon image */}
     </div>
   );
 };
