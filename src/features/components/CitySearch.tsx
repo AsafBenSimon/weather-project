@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { CityData } from "../../types/CityData";
-import { CurrentConditionsData } from "../../types/CurrentConditions";
+import { CityData, CurrentConditionsData } from "../../types/CityData";
 import { weatherService } from "../services/weatherService";
 
 function CitySearch() {

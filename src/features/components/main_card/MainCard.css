@@ -7,7 +7,6 @@
 
 .MainCard {
   position: relative;
-
   display: flex;
   align-items: center;
   justify-content: center;
@@ -17,6 +16,7 @@
   box-shadow: rgba(0, 0, 0, 0.226) 5px 5px 3px;
   width: 175px;
 }
+
 .temps-Container {
   color: rgb(244, 248, 252);
 }
@@ -76,7 +76,7 @@
   border: 1px solid #ddd;
   border-radius: 8px;
   position: absolute;
-  top: 70px; /* Adjust based on the position of your input */
+  top: 70px;
   left: 0;
   right: 0;
   max-height: 200px;
@@ -164,5 +164,128 @@
   .forecast div {
     flex-basis: 100%;
     margin-bottom: 10px;
+  }
+}
+
+/* Container Styling */
+.CitySearchWithForecast {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+  color: #333;
+  border-radius: 10px;
+}
+
+/* Search Bar */
+.CitySearchWithForecast form {
+  position: relative;
+  margin-bottom: 20px;
+}
+
+.CitySearchWithForecast input[type="text"] {
+  width: 100%;
+  padding: 10px 15px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 16px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: border-color 0.3s;
+}
+
+.CitySearchWithForecast input[type="text"]:focus {
+  border-color: #007bff;
+  outline: none;
+}
+
+/* Suggested Cities */
+.suggestions-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  max-height: 200px;
+  overflow-y: auto;
+  position: absolute;
+  width: 100%;
+  z-index: 10;
+}
+
+.suggestions-list li {
+  padding: 10px 15px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.suggestions-list li:hover {
+  background-color: #f0f0f0;
+}
+
+/* Forecast Container */
+.CardLine-Container {
+  display: flex;
+  flex-direction: row;
+  gap: 30px;
+  justify-content: flex-start;
+  align-items: flex-start;
+}
+
+/* Loading and Error States */
+.CardLine-Container p {
+  width: 100%;
+  text-align: center;
+  color: #666;
+  font-style: italic;
+}
+
+/* Individual Forecast Cards */
+.CardLine-Container .Card {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 15px;
+  text-align: center;
+  width: calc(33.33% - 10px);
+  min-width: 150px;
+  transition: transform 0.3s, box-shadow 0.3s;
+  margin-left: -15px;
+}
+
+.CardLine-Container .Card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Card Content */
+.CardLine-Container .Card h3 {
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+.CardLine-Container .Card p {
+  font-size: 14px;
+  margin: 5px 0;
+  color: #555;
+}
+
+/* Icon Styling (Optional, if you're displaying weather icons) */
+.CardLine-Container .Card img {
+  max-width: 50px;
+  margin: 10px auto;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .CardLine-Container .Card {
+    width: calc(50% - 10px);
+  }
+}
+
+@media (max-width: 480px) {
+  .CardLine-Container .Card {
+    width: 100%;
   }
 }

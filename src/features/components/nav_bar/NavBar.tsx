@@ -7,7 +7,6 @@ function NavBar() {
       <h1>Weather app</h1>
       <div className="NavBar-MiniContainer">
         <span>Weather</span>
-        <span>Favorites</span>
       </div>
     </div>
   );
